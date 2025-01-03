@@ -1,16 +1,17 @@
 const weatherForm = document.querySelector('form')
-const search = document.querySelector('input');
+const username = document.getElementById('username');
+const email = document.getElementById('email');
 
 weatherForm.addEventListener('submit', (e) => {
     e.preventDefault()
-    console.log();
 
     axios.post('/submit', {
-        search: search.value,
+        username: username.value,
+        email: email.value,
     })
     .then(function (response) {
+        document.getElementById("result").innerHTML = response.data;
         console.log(response);
-        document.getElementById('result').innerHTML = `<h2>Search Result:</h2><p>${response.data}</p>`;
     })
     .catch(function (error) {
         console.log(error);

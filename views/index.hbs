@@ -7,8 +7,25 @@
 </head>
 
 <body>
+
+    <ul>
+        {{#each users}}
+            <li>{{username}} - {{email}}</li>
+        {{/each}}
+    </ul>
+
     <form method="POST" action="/submit">
-        <input type="text" name="search" placeholder="Search" />
+        <label>Username</label><br>
+        <input type="text" name="username" id="username" />
+
+        <br><br>
+
+        <label>Email</label><br>
+        <input type="email" name="email" id="email" />
+
+        <br><br>
+
+
         <input type="submit" name="submit" value="Submit" />
         <p id="result"></p>
     </form>
