@@ -1,0 +1,80 @@
+{{> header }}
+
+<div class="bg-white">
+    <div class="container py-5">
+
+        <div class="row justify-content-center align-items-center">
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-header py-3">Login</div>
+                    <div class="card-body">
+                        <form method="POST" id="formLogin">
+                            <div class="mb-3">
+                                <label for="email" class="form-label">Email address</label>
+                                <input type="email" class="form-control" id="email" aria-describedby="emailHelp" />
+                                <div id="emailHelp" class="form-text">We'll never share your email with anyone else.
+                                </div>
+                            </div>
+                            <div class="mb-4">
+                                <label for="password" class="form-label">Password</label>
+                                <input type="password" class="form-control" id="password" />
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100 py-2">Login</button>
+                            <div id="message"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+<script>
+    document.getElementById('formLogin').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const formData = {
+            username: document.getElementById('email').value,
+            password: document.getElementById('password').value,
+        };
+
+        // Send form data to the server using axios
+        axios.post('/user/login', formData)
+            .then(function (response) {
+                const { accessToken } = response.data;
+                sessionStorage.setItem('accessToken', accessToken);
+                console.log('Success: ', response);
+                document.getElementById('message').innerHTML = generateSuccess('Login success');
+                //window.location.href = '/profile';
+            })
+            .catch(function (error) {
+                // Check if the error has a response (indicates a server-side error)
+                if (error.response && error.response.data) {
+
+                    // Extract the error message from the server's response
+                    const errorMessage = error.response.data.message || 'An unknown error occurred';
+                    console.log('Error: ', errorMessage);
+                    document.getElementById('message').innerHTML = generateError(errorMessage);
+                } else {
+                    // Handle errors that don't have a response (e.g., network errors)
+                    console.error('Error: ', error.message);
+                    document.getElementById('message').innerHTML = generateError('A network error occurred. Please try again.');
+                }
+            });
+
+    });
+
+    function generateError(msg) {
+        return `<div class="alert alert-danger mt-3">${msg}</div>`;
+    }
+
+    function generateSuccess(msg) {
+        return `<div class="alert alert-success mt-3">${msg}</div>`;
+    }
+
+</script>
+
+
+{{> footer }}

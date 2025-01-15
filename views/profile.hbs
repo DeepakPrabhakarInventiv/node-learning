@@ -1,0 +1,98 @@
+{{> header }}
+
+<div class="bg-white">
+    <div class="container py-5">
+
+        <div class="row justify-content-center align-items-center">
+            <div class="col-lg-8 col-md-12">
+                <div class="card">
+                    <div class="card-header py-3">
+                        <h5 class="card-title">Profile</h5>
+                        <p class="m-0">Hey, {{ user.firstname }} {{ user.lastname }}</p>
+                    </div>
+                    <div class="card-body">
+                        <form method="POST" id="formProfileUpdate">
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="firstName" class="form-label">First Name</label>
+                                    <input type="test" class="form-control" id="firstName" value="{{ user.firstname }}"
+                                        required />
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <label for="lastName" class="form-label">Last Name</label>
+                                    <input type="test" class="form-control" id="lastName" value="{{ user.lastname }}"
+                                        required />
+                                </div>
+                            </div>
+
+                            <div class=" row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="emailAddress" class="form-label">Email Address</label>
+                                    <input type="email" class="form-control" id="emailAddress" value="{{ user.email }}"
+                                        readonly disabled />
+                                </div>
+                            </div>
+
+                            {{!-- <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <label for="password" class="form-label">Password</label>
+                                    <input type="password" class="form-control" id="password" />
+                                    <div id="passwordHelp" class="form-text">Leave blank if don't want to update
+                                        password</div>
+                                </div>
+                            </div> --}}
+
+                            <button type="submit" class="btn btn-primary py-2 px-5 me-auto">Update Profile</button>
+
+                            <div id="message"></div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+<script>
+    const user = {{{ json user }}};
+    document.getElementById('formProfileUpdate').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const formData = {
+            firstname: document.getElementById('firstName').value,
+            lastname: document.getElementById('lastName').value,
+        };
+
+        /*const password = document.getElementById('password').value;
+        if (password != '') {
+            //add password with object
+            formData.password = password;
+        }*/
+
+        // Send form data to the server using axios
+        var url = `/user/${user._id}`;
+        axios.patch(url, formData)
+            .then(function (response) {
+                console.log(response);
+                document.getElementById('message').innerHTML = generateSuccess(response.data.message);
+            })
+            .catch(function (error) {
+                document.getElementById('message').innerHTML = generateError(JSON.stringify(error.response.data.message));
+                console.error(error);
+            });
+
+    });
+
+    function generateError(msg) {
+        return `<div class="alert alert-danger mt-3">${msg}</div>`;
+    }
+
+    function generateSuccess(msg) {
+        return `<div class="alert alert-success mt-3">${msg}</div>`;
+    }
+
+</script>
+
+{{> footer }}
