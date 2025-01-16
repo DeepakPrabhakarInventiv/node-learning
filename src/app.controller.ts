@@ -34,7 +34,6 @@ export class AppController {
 
     return res.render('profile', {
       title: 'Profile Page',
-      loggedIn: true,
       user: user,
     });
   }

@@ -27,7 +27,11 @@ export class LoggedInterceptor implements NestInterceptor {
                 });
 
                 // Attach the user payload to the request object if needed
-                request['user'] = payload;
+                const payloadUpdated = {
+                    ...payload,
+                    _id: payload.id,
+                };
+                request['user'] = payloadUpdated;
 
                 // User is logged in
                 isLoggedIn = true;

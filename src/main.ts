@@ -21,6 +21,14 @@ async function bootstrap() {
     return JSON.stringify(context);
   });
 
+  hbs.registerHelper('truncateWords', function (text, wordLimit) {
+    if (!text) return '';
+    const words = text.split(' ');
+    return words.length > wordLimit
+      ? words.slice(0, wordLimit).join(' ') + '...'
+      : text;
+  });
+
   app.setViewEngine('hbs');
 
   await app.listen(process.env.PORT ?? 3000);

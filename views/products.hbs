@@ -1,0 +1,68 @@
+{{> header }}
+
+<div class="bg-white">
+    <div class="container py-5">
+
+        <h3 class="border-bottom border-dark pb-2 mb-5">Products</h3>
+
+        <!-- Begin::Products -->
+        <div class="row" id="products">
+            {{#each products}}
+            <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
+                <div class="card h-100">
+                    <div class="bg-primary-subtle text-center px-3 py-5">
+                        <div class="category text-capitalize">{{ this.category }}</div>
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title">{{truncateWords this.name 8}}</h5>
+                        <p class="card-text">{{truncateWords this.description 20}}</p>
+                        <p class="card-text">Price: {{this.price}}</p>
+                        <p class="card-text">Quantity: {{this.quantity}}</p>
+                    </div>
+                    <div class="card-footer py-3">
+                        <button type="button" class="add-to-cart btn btn-outline-primary w-100 mb-3"
+                            data-pid="{{ this._id }}">Add
+                            to Cart</button>
+                        <button type="button" class="btn btn-outline-dark w-100">Add to Wishlist</button>
+                    </div>
+
+                </div>
+            </div>
+            {{/each}}
+        </div>
+        <!-- End::Products -->
+
+    </div>
+</div>
+
+
+
+<script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+<script>
+    const container = document.getElementById('products');
+
+    container.addEventListener('click', (event) => {
+        if (event.target.classList.contains('add-to-cart')) {
+            const pid = event.target.getAttribute('data-pid');
+
+            const formData = {
+                product_id: pid,
+                count: 1,
+            };
+
+            axios.post('/cart', formData)
+                .then(function (response) {
+                    console.log(response);
+                    alert(response.data.message);
+                })
+                .catch(function (error) {
+                    console.error(error);
+                    alert(error.response.data.message);
+                });
+
+        }
+    });
+
+</script>
+
+{{> footer }}

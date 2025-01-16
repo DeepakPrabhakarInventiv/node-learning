@@ -1,0 +1,141 @@
+{{> header }}
+
+<div class="bg-white">
+    <div class="container py-5">
+
+        <h3 class="border-bottom border-dark pb-2 mb-5">Cart</h3>
+
+        <!-- Begin::Products -->
+        <div class="row">
+            <div class="col-md-9">
+                <div id="products">Loading...</div>
+            </div>
+            <div class="col-md-3" id="sidebar">
+                <p>Payment Info:</p>
+                <p>There are many variations of passages of Lorem Ipsum available, but the majority have suffered
+                    alteration in some form, by injected humour, or randomised words which don't look even slightly
+                    believable.</p>
+                <button type="button" class="btn btn-primary w-100">Checkout</button>
+            </div>
+        </div>
+        <!-- End::Products -->
+
+    </div>
+</div>
+
+
+
+<script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+<script>
+    window.addEventListener('load', function () {
+        // Send form data to the server using axios
+        const url = `/cart/products`;
+        axios.post(url)
+            .then(function (response) {
+                console.log(response);
+                document.getElementById('products').innerHTML = generateCart(response.data);
+            })
+            .catch(function (error) {
+                document.getElementById('products').innerHTML = error.response.data.message;
+                console.error(error);
+            });
+    });
+
+    function generateCart(products) {
+        let outputHtml = `<table class="table table-bordered table-striped table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Product Name</th>
+                                    <th>Price</th>
+                                    <th>Count</th>
+                                    <th>Remove</th>
+                                </tr>
+                            </thead>`;
+
+        outputHtml += `<tbody id="cart-items">`;
+        products.forEach(function (productItem, index) {
+            const product = productItem.product_id;
+            outputHtml += `<tr data-cid="${productItem._id}">
+                                <td><strong>${product.name}</strong> <br> ${product.category}</td>
+                                <td><strong>${product.price}</strong></td>
+                                <td><input type="number" name="quantity" value="${productItem.count}" class="form-control" style="max-width:80px"/></td>
+                                <td><button type="button" class="remove-from-cart btn btn-outline-danger" data-cid="${productItem._id}">Remove</button></td>
+                            </tr>`;
+        });
+        outputHtml += `</tbody>`;
+        outputHtml += `<tfoot>
+                        <tr>
+                            <td colspan="4" class="text-end"><button type="button" id="update-cart-btn" class="btn btn-primary px-5">Update Cart</button></td>
+                        </tr>
+                        </tfoot>`;
+        outputHtml += `</table>`;
+        return outputHtml;
+    }
+
+
+    //update the cart
+    document.getElementById("products").addEventListener("click", function (event) {
+        // Check if the clicked element is the button
+        if (event.target && event.target.id === "update-cart-btn") {
+            //Loop by product
+            let products = [];
+
+            const rows = document.querySelectorAll("#cart-items tr");
+            // Loop through each row and get the values from the inputs
+            rows.forEach(function (row) {
+
+                // Get the value from the data-pid attribute
+                const cartId = row.getAttribute("data-cid");
+                const productQuantity = row.querySelector('input[name="quantity"]') ? row.querySelector('input[name="quantity"]').value : ''; // Get quantity input value
+
+                products.push({
+                    id: cartId,
+                    count: productQuantity,
+                })
+            });
+
+            //send it to API
+            const formData = {
+                'products': products
+            };
+            const url = `/cart/update`;
+            axios.post(url, formData)
+                .then(function (response) {
+                    console.log(response);
+                    alert("Cart has been updated successfully!");
+                    location.reload();
+                })
+                .catch(function (error) {
+                    console.error(error);
+                    alert(error.response.data.message);
+                });
+
+        }
+    });
+
+    //remove from the cart
+    const container = document.getElementById('products');
+    container.addEventListener('click', (event) => {
+        if (event.target.classList.contains('remove-from-cart')) {
+            const cid = event.target.getAttribute('data-cid');
+            //send it to API
+            const formData = {
+                'id': cid
+            };
+            const url = `/cart/delete`;
+            axios.post(url, formData)
+                .then(function (response) {
+                    console.log(response);
+                    alert("Cart item has been removed successfully!");
+                    location.reload();
+                })
+                .catch(function (error) {
+                    console.error(error);
+                    alert(error.response.data.message);
+                });
+        }
+    });
+
+</script>
+
+{{> footer }}
