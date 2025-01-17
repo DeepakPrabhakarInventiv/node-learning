@@ -11,10 +11,9 @@ export class ProductService {
   constructor(@InjectModel(Product.name) private productModel: Model<Product>) { }
 
   async create(createProductDto: CreateProductDto) {
+
     try {
-
       const createdProduct = new this.productModel(createProductDto);
-
       await createdProduct.save();
 
       return {

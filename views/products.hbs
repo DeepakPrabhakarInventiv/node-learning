@@ -23,7 +23,9 @@
                         <button type="button" class="add-to-cart btn btn-outline-primary w-100 mb-3"
                             data-pid="{{ this._id }}">Add
                             to Cart</button>
-                        <button type="button" class="btn btn-outline-dark w-100">Add to Wishlist</button>
+                        <button type="button" class="add-to-wishlist btn btn-outline-dark w-100"
+                            data-pid="{{ this._id }}">Add to
+                            Wishlist</button>
                     </div>
 
                 </div>
@@ -35,12 +37,15 @@
     </div>
 </div>
 
+<!-- Toast Container -->
+<div id="toast-container" class="toast-container position-fixed bottom-0 end-0 p-3"></div>
 
 
 <script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
 <script>
     const container = document.getElementById('products');
 
+    //add to cart
     container.addEventListener('click', (event) => {
         if (event.target.classList.contains('add-to-cart')) {
             const pid = event.target.getAttribute('data-pid');
@@ -53,15 +58,75 @@
             axios.post('/cart', formData)
                 .then(function (response) {
                     console.log(response);
-                    alert(response.data.message);
+                    createToast('Success', response.data.message, 'success');
                 })
                 .catch(function (error) {
                     console.error(error);
-                    alert(error.response.data.message);
+                    createToast('Error', error.response.data.message, 'danger');
                 });
 
         }
     });
+
+    //add to wishlist
+    container.addEventListener('click', (event) => {
+        if (event.target.classList.contains('add-to-wishlist')) {
+            const pid = event.target.getAttribute('data-pid');
+
+            const formData = {
+                product_id: pid,
+                count: 1,
+            };
+
+            axios.post('/wishlist', formData)
+                .then(function (response) {
+                    console.log(response);
+                    createToast('Success', response.data.message, 'success');
+                })
+                .catch(function (error) {
+                    console.error(error);
+                    createToast('Error', error.response.data.message, 'danger');
+                });
+
+        }
+    });
+
+
+    // Function to create and show a Bootstrap toast
+    function createToast(title, message, type) {
+        // Generate a unique ID for the toast
+        const toastId = `toast-${Date.now()}`;
+
+        // Toast template
+        const toastHtml = `
+        <div id="${toastId}" class="toast align-items-center text-bg-${type} border-0" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="d-flex" data-bs-theme="dark">
+            <div class="toast-body" >
+              <strong>${title}:</strong> ${message}
+            </div>
+            <button type="button" class="btn-close me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+          </div>
+        </div>
+      `;
+
+        // Create a wrapper element and set its inner HTML
+        const wrapper = document.createElement('div');
+        wrapper.innerHTML = toastHtml.trim();
+
+        // Append the toast to the container
+        const toastContainer = document.getElementById('toast-container');
+        toastContainer.appendChild(wrapper.firstChild);
+
+        // Initialize and show the toast
+        const toastElement = document.getElementById(toastId);
+        const toast = new bootstrap.Toast(toastElement, { delay: 5000 }); // 5-second delay
+        toast.show();
+
+        // Remove the toast from the DOM after it hides
+        toastElement.addEventListener('hidden.bs.toast', function () {
+            toastElement.remove();
+        });
+    }
 
 </script>
 

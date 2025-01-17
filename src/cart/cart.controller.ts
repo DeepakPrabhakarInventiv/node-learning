@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors, Req, Res } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseGuards, UseInterceptors, Req, Res, HttpException, HttpStatus } from '@nestjs/common';
 import { CartService } from './cart.service';
 import { CreateCartDto } from './dto/create-cart.dto';
 import { UpdateCartDto } from './dto/update-cart.dto';
@@ -7,58 +7,82 @@ import { LoggedInterceptor } from 'src/auth/logged.interceptor';
 import { Request, Response } from 'express';
 import { User } from 'src/user/schema/user.schema';
 import { ProductService } from 'src/product/product.service';
+import { WishlistService } from 'src/wishlist/wishlist.service';
 
 @UseGuards(AuthGuard('jwt'))
-@UseInterceptors(LoggedInterceptor)
 @Controller('cart')
 export class CartController {
 
-  constructor(private readonly cartService: CartService, private readonly productService: ProductService) { }
+  constructor(private readonly cartService: CartService, private readonly productService: ProductService, private readonly wishlistService: WishlistService) { }
 
   @Post()
-  async create(@Body('product_id') product_id: any, @Body('count') count: number, @Req() req: Request): Promise<any> {
+  async create(@Body('product_id') product_id: any, @Body('count') count: number, @Req() req: any): Promise<any> {
 
     // Validate product existence
-    const product = await this.productService.findOne(product_id);
+    const product = await this.productService.findOne(product_id.toString());
     if (!product) {
-      throw new Error('Product not found');
+      throw new HttpException({ message: 'Product not found' }, HttpStatus.BAD_REQUEST);
     }
 
-    const currentuser = req.user as User;
+    //count validation
+    if (product.quantity < count) {
+      throw new HttpException({ message: 'Product stock not availabe' }, HttpStatus.BAD_REQUEST);
+    }
+
+    const currentuserId = req.user.id;
 
     // Set the encrypted password in the DTO
     const createCartDtoUpdated = {
       product_id: product_id,
-      user_id: currentuser?._id, // Accessing `id` safely
+      user_id: currentuserId, // Accessing `id` safely
       count: count
     };
 
-    return this.cartService.create(createCartDtoUpdated);
+    const cartProduct = await this.cartService.create(createCartDtoUpdated);
+
+    //delete from wishlist
+    const deleteWishlist = await this.wishlistService.deleteWishlistByPid(product_id, currentuserId);
+
+    return cartProduct;
+
+
+
   }
 
-  @Get()
-  async findAll(@Req() req: Request, @Res() res: Response) {
-    return res.render('cart', { title: 'Cart Page' });
-  }
 
   @Post('/products')
-  async getUserCartProducts(@Req() req: Request): Promise<any> {
-    const currentuser = req.user as User;
-    const cart_products = await this.cartService.findByUserId(currentuser?._id);
+  async getUserCartProducts(@Req() req: any): Promise<any> {
+    const currentuserId = req.user.id;
+    const cart_products = await this.cartService.findByUserId(currentuserId);
 
     return cart_products;
   }
 
-  @Post('/update')
-  async updateCart(@Body('products') products: any, @Req() req: Request): Promise<any> {
-    const currentuser = req.user as User;
-    return await this.cartService.updateCart(products, currentuser?._id);
+  @Patch(':id')
+  async update(@Param('id') id: string, @Body() updateCartDto: UpdateCartDto) {
+
+    const product_id = updateCartDto.product_id;
+
+    // Validate product existence
+    const product = await this.productService.findOne(product_id.toString());
+    if (!product) {
+      throw new HttpException({ message: 'Product not found' }, HttpStatus.BAD_REQUEST);
+    }
+
+    //count validation
+    if (product.quantity < updateCartDto.count) {
+      throw new HttpException({ message: 'Product stock not availabe' }, HttpStatus.BAD_REQUEST);
+    }
+
+
+
+    return await this.cartService.update(id, updateCartDto);
   }
 
   @Post('/delete')
-  async deleteCart(@Body('id') cartid: any, @Req() req: Request): Promise<any> {
-    const currentuser = req.user as User;
-    return await this.cartService.deleteCart(cartid, currentuser?._id);
+  async deleteCart(@Body('id') cartid: any, @Req() req: any): Promise<any> {
+    const currentuserId = req.user.id;
+    return await this.cartService.deleteCart(cartid, currentuserId);
   }
 
 }

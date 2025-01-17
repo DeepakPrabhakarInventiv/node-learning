@@ -3,7 +3,7 @@
 <div class="bg-white">
     <div class="container py-5">
 
-        <h3 class="border-bottom border-dark pb-2 mb-5">Cart</h3>
+        <h3 class="border-bottom border-dark pb-2 mb-5">Wishlist</h3>
 
         <!-- Begin::Products -->
         <div class="row">
@@ -11,11 +11,10 @@
                 <div id="products">Loading...</div>
             </div>
             <div class="col-md-3" id="sidebar">
-                <p>Payment Info:</p>
+                <p>Wishlist Info:</p>
                 <p>There are many variations of passages of Lorem Ipsum available, but the majority have suffered
                     alteration in some form, by injected humour, or randomised words which don't look even slightly
                     believable.</p>
-                <button type="button" class="btn btn-primary w-100">Checkout</button>
             </div>
         </div>
         <!-- End::Products -->
@@ -31,11 +30,11 @@
 <script>
     window.addEventListener('load', function () {
         // Send form data to the server using axios
-        const url = `/cart/products`;
+        const url = `/wishlist/products`;
         axios.post(url)
             .then(function (response) {
                 console.log(response);
-                document.getElementById('products').innerHTML = generateCart(response.data);
+                document.getElementById('products').innerHTML = generateWishlist(response.data);
             })
             .catch(function (error) {
                 document.getElementById('products').innerHTML = error.response.data.message;
@@ -43,7 +42,7 @@
             });
     });
 
-    function generateCart(products) {
+    function generateWishlist(products) {
         let outputHtml = `<div id="cart-items">`;
         products.forEach(function (productItem, index) {
             const product = productItem.product_id;
@@ -58,12 +57,11 @@
                                         <div class="row">
                                             <div class="col">
                                                 <div class="update-cart d-flex">
-                                                    <input type="number" id="cq-${productItem._id}" name="quantity" value="${productItem.count}" class="form-control" style="max-width:60px"/>
-                                                    <button type="button" name="update-cart-btn" class="update-cart-btn btn btn-outline-primary ms-2" data-cid="${productItem._id}" data-pid="${product._id}">Update</button>
+                                                    <button type="button" name="update-cart-btn" class="update-cart-btn btn btn-outline-primary ms-2" data-cid="${productItem._id}" data-pid="${product._id}">Add to Cart</button>
                                                 </div>
                                             </div>
                                             <div class="col text-end">
-                                                <button type="button" class="remove-from-cart btn btn-outline-danger" data-cid="${productItem._id}">Remove</button>
+                                                <button type="button" class="remove-from-wishlist btn btn-outline-danger" data-cid="${productItem._id}">Remove</button>
                                             </div>
                                         </div>
                                     </form>
@@ -80,18 +78,19 @@
         if (event.target.classList.contains('update-cart-btn')) {
             const cid = event.target.getAttribute('data-cid');
             const pid = event.target.getAttribute('data-pid');
-            const quantity = document.getElementById(`cq-${cid}`).value;
+            const quantity = 1;
             //send it to API
             const formData = {
                 'count': quantity,
                 'product_id': pid,
             };
 
-            const url = `/cart/${cid}`;
-            axios.patch(url, formData)
+            const url = `/cart/`;
+            axios.post(url, formData)
                 .then(function (response) {
                     console.log(response);
                     createToast('Success', response.data.message, 'success');
+                    document.getElementById(cid).remove();
                 })
                 .catch(function (error) {
                     console.error(error);
@@ -100,15 +99,15 @@
         }
     });
 
-    //remove from the cart
+    //remove from the wishlist
     container.addEventListener('click', (event) => {
-        if (event.target.classList.contains('remove-from-cart')) {
+        if (event.target.classList.contains('remove-from-wishlist')) {
             const cid = event.target.getAttribute('data-cid');
             //send it to API
             const formData = {
                 'id': cid
             };
-            const url = `/cart/delete`;
+            const url = `/wishlist/delete`;
             axios.post(url, formData)
                 .then(function (response) {
                     console.log(response);

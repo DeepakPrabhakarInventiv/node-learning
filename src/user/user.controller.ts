@@ -9,8 +9,7 @@ import { AuthService } from 'src/auth/auth.service';
 @Controller('user')
 export class UserController {
   constructor(
-    private readonly userService: UserService,
-    private readonly authService: AuthService,
+    private readonly userService: UserService
   ) { }
 
   @Post()
@@ -20,9 +19,9 @@ export class UserController {
 
   @UseGuards(AuthGuard('local'))
   @Post('login')
-  async doLogin(@Req() req: Request, @Res() res: Response) {
+  async doLogin(@Req() req: any, @Res() res: any) {
 
-    const accessToken = await this.authService.generateTokens(req.user);
+    const accessToken = req.user.token;
 
     res.cookie('token', accessToken, {
       secure: true, // Ensures the cookie is sent over HTTPS
@@ -31,7 +30,7 @@ export class UserController {
     });
 
     // Send the access token in the response
-    return res.send(accessToken);
+    return res.send(req.user);
 
   }
 

@@ -6,6 +6,7 @@ import { AuthModule } from './auth/auth.module';
 import { AuthMiddleware } from './auth/auth.middleware';
 import { ProductModule } from './product/product.module';
 import { CartModule } from './cart/cart.module';
+import { WishlistModule } from './wishlist/wishlist.module';
 
 @Module({
   imports: [
@@ -14,6 +15,7 @@ import { CartModule } from './cart/cart.module';
     AuthModule,
     ProductModule,
     CartModule,
+    WishlistModule,
   ],
   controllers: [AppController],
 })

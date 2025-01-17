@@ -7,7 +7,6 @@ import { Response } from 'express';
 import { LoggedInterceptor } from 'src/auth/logged.interceptor';
 
 @UseGuards(AuthGuard('jwt'))
-@UseInterceptors(LoggedInterceptor)
 @Controller('product')
 export class ProductController {
   constructor(private readonly productService: ProductService) { }
@@ -15,16 +14,6 @@ export class ProductController {
   @Post()
   create(@Body(new ValidationPipe()) createProductDto: CreateProductDto) {
     return this.productService.create(createProductDto);
-  }
-
-  @Get()
-  async findAll(@Res() res: Response) {
-    const products = await this.productService.findAll();
-
-    return res.render('products', {
-      title: 'Products',
-      products: products
-    });
   }
 
   @Get(':id')

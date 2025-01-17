@@ -9,7 +9,7 @@ import { use } from "passport";
 @Injectable()
 export class LocalStrategy extends PassportStrategy(Strategy) {
 
-    constructor(private userService: UserService) {
+    constructor(private userService: UserService, private jwtService: JwtService) {
         super();
     }
 
@@ -24,7 +24,24 @@ export class LocalStrategy extends PassportStrategy(Strategy) {
 
         if (!isMatch) throw new UnauthorizedException("email or password do not match");
 
-        return user;
+        //Generate Token
+        const payload = {
+            id: user._id.toString(),
+            firstname: user.firstname,
+            lastname: user.lastname,
+            email: user.email,
+            role: user.role
+        }
+
+        const token = this.jwtService.sign(payload);
+
+
+        return {
+            success: true,
+            message: 'Login successfull',
+            user: user,
+            token: token,
+        };
 
     }
 

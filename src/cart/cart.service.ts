@@ -8,7 +8,6 @@ import { Model } from 'mongoose';
 
 @Injectable()
 export class CartService {
-  productModel: any;
 
   constructor(@InjectModel(Cart.name) private cartModel: Model<Cart>) { }
 
@@ -68,29 +67,16 @@ export class CartService {
 
   }
 
-  async updateCart(products, userid) {
+  update(id: string, updateCartDto: UpdateCartDto) {
 
     try {
-      const updateOperations = products.map((updateCartItem) => ({
-        updateOne: {
-          filter: { _id: updateCartItem.id, user_id: userid },
-          update: { $set: { count: updateCartItem.count } }
-        }
-      }));
-
-      await this.cartModel.bulkWrite(updateOperations);
-
+      const updatedUser = this.cartModel.updateOne({ _id: id }, updateCartDto).exec();
       return {
-        message: `Cart Items has been updated`,
+        message: 'Cart has been updated',
       }
     } catch (error) {
-      throw new HttpException({ message: error.errmsg },
-        HttpStatus.BAD_REQUEST,
-      );
+      throw new HttpException({ message: error.errmsg }, HttpStatus.BAD_REQUEST);
     }
-
-
-
 
   }
 
@@ -114,5 +100,10 @@ export class CartService {
     }
 
   }
+
+  async countCart(id: any) {
+    return this.cartModel.countDocuments({ user_id: id }).exec();
+  }
+
 
 }
