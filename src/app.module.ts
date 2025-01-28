@@ -7,6 +7,8 @@ import { AuthMiddleware } from './auth/auth.middleware';
 import { ProductModule } from './product/product.module';
 import { CartModule } from './cart/cart.module';
 import { WishlistModule } from './wishlist/wishlist.module';
+import { OrderModule } from './order/order.module';
+import { RedisModule } from './redis/redis.module';
 
 @Module({
   imports: [
@@ -16,6 +18,8 @@ import { WishlistModule } from './wishlist/wishlist.module';
     ProductModule,
     CartModule,
     WishlistModule,
+    OrderModule,
+    RedisModule,
   ],
   controllers: [AppController],
 })

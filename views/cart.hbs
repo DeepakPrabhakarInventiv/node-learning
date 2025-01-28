@@ -8,14 +8,16 @@
         <!-- Begin::Products -->
         <div class="row">
             <div class="col-md-9">
-                <div id="products">Loading...</div>
+                <div id="products" class="cart-items">
+                    Loading...
+                </div>
             </div>
             <div class="col-md-3" id="sidebar">
-                <p>Payment Info:</p>
-                <p>There are many variations of passages of Lorem Ipsum available, but the majority have suffered
-                    alteration in some form, by injected humour, or randomised words which don't look even slightly
-                    believable.</p>
-                <button type="button" class="btn btn-primary w-100">Checkout</button>
+                <div class="border p-3 rounded">
+                    <h3 class="border-bottom border-dark pb-1 mb-3">Cart Summary</h3>
+                    <div id="order-info"></div>
+                    <a href="/checkout" class="btn btn-primary w-100">Checkout</a>
+                </div>
             </div>
         </div>
         <!-- End::Products -->
@@ -36,6 +38,10 @@
             .then(function (response) {
                 console.log(response);
                 document.getElementById('products').innerHTML = generateCart(response.data);
+
+                //update sidebar
+                updateSidebar();
+
             })
             .catch(function (error) {
                 document.getElementById('products').innerHTML = error.response.data.message;
@@ -44,14 +50,14 @@
     });
 
     function generateCart(products) {
-        let outputHtml = `<div id="cart-items">`;
+        let outputHtml = ``;
         products.forEach(function (productItem, index) {
             const product = productItem.product_id;
-            outputHtml += `<div class="card mb-3" id="${productItem._id}">
+            outputHtml += `<div class="cart-item card mb-3" id="${productItem._id}">
                                 <div class="card-body">
-                                    <h5>${product.name}</h5> 
+                                    <h5 class="product-name">${product.name}</h5> 
                                     <p>Category: ${product.category}</p>
-                                    <p>Price: ${product.price}</p>
+                                    <p>Price: <span class="price-value">${product.price}</span></p>
                                 </div>
                                 <div class="card-footer">
                                     <form method="POST" class="form">
@@ -70,8 +76,44 @@
                                 </div>
                             </div>`;
         });
-        outputHtml += `</div>`;
+
+
         return outputHtml;
+
+    }
+
+    function updateSidebar() {
+
+        // Get the container and sidebar
+        const cartItemsContainer = document.querySelector(".cart-items");
+        const cartItems = cartItemsContainer.querySelectorAll(".cart-item");
+        const totalItems = cartItems.length;
+        let total = parseFloat(0);
+
+        var outputHtml = '<div class="">';
+        cartItems.forEach((item, index) => {
+            const productName = item.querySelector(".product-name")?.textContent || `Product ${index + 1}`;
+            const quantity = parseInt(item.querySelector("input[name='quantity']").value);
+            const price = parseFloat(item.querySelector(".price-value")?.textContent);
+            const subtotal = price * quantity;
+            total += subtotal;
+
+
+            outputHtml += `<div class="border-bottom mb-3 mt-0 pb-3">
+                                    <h5>${productName}</h5> 
+                                    <p class="m-0">Quantity: ${quantity}</p>
+                                    <p class="m-0">Price: ${price}</p>
+                                    <p class="m-0">Sub Total: ${subtotal}</p>
+                                </div>`;
+        });
+
+        outputHtml += `<div class="border-bottom mb-3 mt-0 pb-3">
+                                    <h5>Total : ${total}</h5> 
+                                </div>`;
+
+        document.getElementById('order-info').innerHTML = outputHtml;
+
+
     }
 
     //update thr cart
@@ -92,6 +134,9 @@
                 .then(function (response) {
                     console.log(response);
                     createToast('Success', response.data.message, 'success');
+
+                    //update sidebar
+                    updateSidebar();
                 })
                 .catch(function (error) {
                     console.error(error);
@@ -115,6 +160,8 @@
                     createToast('Success', response.data.message, 'success');
                     document.getElementById(cid).remove();
 
+                    //update sidebar
+                    updateSidebar();
                 })
                 .catch(function (error) {
                     console.error(error);

@@ -1,0 +1,164 @@
+{{> header }}
+
+<div class="bg-white">
+    <div class="container py-5">
+
+        <h3 class="alert alert-primary mb-4">Checkout</h3>
+
+        <!-- Begin::Products -->
+        <div class="row">
+            <div class="col-md-9 border-end pt-3">
+                <h3 class="border-bottom border-dark pb-2 mb-3">User Details:</h3>
+                <div class="row">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="firstName" class="form-label">First Name</label>
+                            <input type="test" class="form-control" id="firstName" value="{{ user.firstname }}"
+                                readonly />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="lastName" class="form-label">Last Name</label>
+                            <input type="test" class="form-control" id="lastName" value="{{ user.lastname }}"
+                                readonly />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="test" class="form-control" id="email" value="{{ user.email }}" readonly />
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="border-bottom border-dark pb-2 mb-3">Shipping Address:</h3>
+                <form method="POST" id="placeOrderForm">
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <label for="address1" class="form-label">Address 1</label>
+                            <input type="test" class="form-control" id="address1" required />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="address2" class="form-label">Address 2</label>
+                            <input type="test" class="form-control" id="address2" />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="city" class="form-label">Town/City</label>
+                            <input type="test" class="form-control" id="city" required />
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <label for="postcode" class="form-label">Postcode</label>
+                            <input type="test" class="form-control" id="postcode" required />
+                        </div>
+
+                        <div class="col-12 clearfix">
+                            <hr />
+                        </div>
+
+                        <!-- Order Place -->
+                        <div class="col-md-12 mt-3 mb-3">
+                            <div id="message"></div>
+                            <button type="submit" name="order_place" class="btn btn-primary py-3 w-100">Order
+                                Place</button>
+                        </div>
+
+                    </div>
+                </form>
+            </div>
+
+            <div class="col-md-3" id="sidebar">
+                <div class="border p-3 rounded">
+                    <h3 class="border-bottom border-dark pb-1 mb-3">Order Details</h3>
+                    <div class="cart-items">
+                        {{#each cart }}
+                        <div class="cart-item" data-productname="{{ this.product_id.name }}"
+                            data-quantity="{{ this.count }}" data-price="{{ this.product_id.price }}"></div>
+                        {{/each }}
+                    </div>
+                    <div id="order-info">
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End::Products -->
+
+    </div>
+</div>
+
+<script src="https://unpkg.com/axios@1.6.7/dist/axios.min.js"></script>
+<script>
+    document.getElementById('placeOrderForm').addEventListener('submit', function (event) {
+        event.preventDefault();
+
+        const formData = {
+            'address': document.getElementById('address1').value + ' ' + document.getElementById('address2').value + ' ' + document.getElementById('city').value + ' ' + document.getElementById('postcode').value,
+        };
+
+        // Send form data to the server using axios
+        axios.post('/order', formData)
+            .then(function (response) {
+                console.log(response);
+                document.getElementById('message').innerHTML = generateSuccess(response.data.message);
+
+                const orderId = response.data.orderid;
+                console.log(orderId);
+                setTimeout(function () {
+                    window.location.href = `/order-success/${orderId}`;
+                }, 3000);
+
+            })
+            .catch(function (error) {
+                document.getElementById('message').innerHTML = generateError(JSON.stringify(error.response.data.message));
+                console.error(error);
+            });
+
+    });
+
+    function generateError(msg) {
+        return `<div class="alert alert-danger mt-3">${msg}</div>`;
+    }
+
+    function generateSuccess(msg) {
+        return `<div class="alert alert-success mt-3">${msg}</div>`;
+    }
+
+    function updateSidebar() {
+
+        // Get the container and sidebar
+        const cartItemsContainer = document.querySelector(".cart-items");
+        const cartItems = cartItemsContainer.querySelectorAll(".cart-item");
+        const totalItems = cartItems.length;
+        let total = parseFloat(0);
+
+        var outputHtml = '<div class="">';
+        cartItems.forEach((item, index) => {
+            const productName = item.getAttribute('data-productname');
+            const quantity = item.getAttribute('data-quantity');
+            const price = item.getAttribute('data-price');
+            const subtotal = price * quantity;
+            total += subtotal;
+
+
+            outputHtml += `<div class="border-bottom mb-3 mt-0 pb-3">
+                                    <h5>${productName}</h5> 
+                                    <p class="m-0">Quantity: ${quantity}</p>
+                                    <p class="m-0">Price: ${price}</p>
+                                    <p class="m-0">Sub Total: ${subtotal}</p>
+                                </div>`;
+        });
+
+        outputHtml += `<div class="border-bottom mb-3 mt-0 pb-3">
+                                    <h5>Total : ${total}</h5> 
+                                </div>`;
+
+        document.getElementById('order-info').innerHTML = outputHtml;
+
+
+
+    }
+
+    updateSidebar();
+
+
+</script>
+
+
+
+{{> footer }}

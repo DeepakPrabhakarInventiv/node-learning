@@ -29,6 +29,22 @@ async function bootstrap() {
       : text;
   });
 
+  // Register custom helper to compare two values
+  hbs.registerHelper('ifNotEqual', function (value1, value2, options) {
+    if (value1 !== value2) {
+      return options.fn(this); // Render block if values are not equal
+    } else {
+      return options.inverse(this); // Render else block if values are equal
+    }
+  });
+
+  // Register a date format helper
+  const moment = require('moment');
+  hbs.registerHelper('formatDate', function (dateString, format) {
+    return moment(dateString).format(format || 'MMM DD, YYYY, hh:mm:ss A');
+  });
+
+
   app.setViewEngine('hbs');
 
   await app.listen(process.env.PORT ?? 3000);

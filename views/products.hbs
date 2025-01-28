@@ -34,6 +34,22 @@
         </div>
         <!-- End::Products -->
 
+        <!-- Begin::Pagination -->
+        <div class="text-center border-top pt-3 mt-3">
+            {{#if prevCursor}}
+            <a href="?cursor={{prevCursor}}&direction=prev" class="btn btn-outline-dark">
+                Prev
+            </a>
+            {{/if}}
+
+            {{#if nextCursor }}
+            <a href="?cursor={{nextCursor}}&direction=next" class="btn btn-outline-dark">
+                Next
+            </a>
+            {{/if}}
+        </div>
+        <!-- End::Pagination -->
+
     </div>
 </div>
 

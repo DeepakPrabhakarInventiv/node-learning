@@ -1,0 +1,46 @@
+{{> header }}
+
+<div class="bg-white">
+    <div class="container py-5">
+
+        <div class="success-data text-center ">
+            <i class="bi bi-check-circle text-success" style="font-size:100px"></i>
+            <h3 class="border-bottom border-dark pb-4 mb-5">Thank yoy for your purchase</h3>
+        </div>
+
+
+        <!-- Begin::Products -->
+        <div class="row">
+            <div class="col-md-12">
+                <div id="products" class="order-items">
+                    {{#each order.items }}
+                    <div class="order-item card mb-3">
+                        <div class="card-header">{{ this.product_id.name }}</div>
+                        <div class="card-body">
+                            <p class="m-0">Price: {{ this.price }}</p>
+                            <p class="m-0">Quantity: {{ this.quantity }}</p>
+                        </div>
+                    </div>
+                    {{/each }}
+
+                    <div class="card">
+                        <div class="card-body">
+                            <p class="m-0"><strong>Shipping Address:</strong> {{ order.address }}</p>
+                        </div>
+                    </div>
+
+                    <div class="card mt-3">
+                        <div class="card-body">
+                            <h3>Total: {{ order.totalAmount }}</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- End::Products -->
+
+    </div>
+</div>
+
+
+{{> footer }}

@@ -55,6 +55,18 @@ export class CartService {
     }
   }
 
+  async find(id: any): Promise<any> {
+
+    const products = await this.cartModel
+      .find({ user_id: id })
+      .populate('product_id', 'name quantity price')
+      .lean()
+      .exec();
+
+    return products;
+
+  }
+
   async findByUserId(id: any): Promise<any> {
 
     const products = await this.cartModel

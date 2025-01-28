@@ -1,0 +1,54 @@
+{{> header }}
+
+<div class="bg-white">
+    <div class="container py-5">
+
+        <div class="success-data">
+            <h3 class="border-bottom border-dark pb-2 mb-5">My Orders</h3>
+        </div>
+
+        <!-- Begin::Products -->
+        <div class="row">
+            <div class="col-md-12">
+                <div id="products" class="orders">
+                    {{#each orders }}
+                    <div class="order-item card mb-3">
+                        <div class="card-header py-4">
+                            <div class="d-flex justify-content-between">
+                                <span class="bg-primary-subtle px-3 py-2 rounded">Order {{ this._id }}</span>
+                                <a href="#" class="btn btn-primary"> Track Order</a>
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            {{#each this.items }}
+                            <div class="product-item mb-3 pb-3 border-bottom">
+                                <div class="row align-items-center">
+                                    <div class="col">
+                                        <p class="m-0"><strong>Product Name:</strong> {{ this.product_id.name }}</p>
+                                        <p class="m-0"><strong>Price:</strong> {{ this.price }}</p>
+                                        <p class="m-0"><strong>Qunatity:</strong> {{ this.quantity }}</p>
+                                    </div>
+                                    <div class="col text-center">
+                                        <p>Status: <br> <span class="badge text-bg-primary p-2">{{ ../status }}</span>
+                                        </p>
+                                    </div>
+                                    <div class="col text-center">
+                                        <p>Date: <br> <span>{{formatDate ../updatedAt 'DD MMM, YYYY hh:mm A'}}</span>
+                                        </p>
+                                    </div>
+                                </div>
+                            </div>
+                            {{/each }}
+                        </div>
+                    </div>
+                    {{/each }}
+                </div>
+            </div>
+        </div>
+        <!-- End::Products -->
+
+    </div>
+</div>
+
+
+{{> footer }}
