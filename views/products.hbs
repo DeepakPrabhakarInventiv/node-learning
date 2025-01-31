@@ -5,7 +5,38 @@
 
         <h3 class="border-bottom border-dark pb-2 mb-5">Products</h3>
 
+        <!-- Begin::Filters -->
+        <div class="row mb-3">
+            <div class="col-md-9">
+                <form method="GET">
+                    <div class="input-group">
+                        <input type="text" class="form-control" placeholder="Search here..." name="search"
+                            value="{{ search }}" />
+                        <button class="btn btn-outline-secondary" type="submit">Search</button>
+                    </div>
+                </form>
+            </div>
+            <div class="col-md-3">
+                <form method="GET" id="sortby-form">
+                    <div class="input-group">
+                        <select class="form-select" name="sortby" id="sortby">
+                            <option value="" selected>Sort By</option>
+                            <option value="price-asc">Price Ascending
+                            </option>
+                            <option value="price-desc">Price Decending
+                            </option>
+                        </select>
+                        <button type="submit" class="btn btn-outline-dark">Filter</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <!-- End::Filters -->
+
         <!-- Begin::Products -->
+        <div class="text-end border-bottom my-3 pb-2">
+            <span class="fw-bold">Pages : {{ currentPage }} / {{ totalPages }}</span>
+        </div>
         <div class="row" id="products">
             {{#each products}}
             <div class="col-lg-4 col-md-6 col-sm-12 mb-4">
@@ -36,17 +67,17 @@
 
         <!-- Begin::Pagination -->
         <div class="text-center border-top pt-3 mt-3">
-            {{#if prevCursor}}
-            <a href="?cursor={{prevCursor}}&direction=prev" class="btn btn-outline-dark">
+            {{#if prevPage }}
+            <a href="?page={{prevPage}}&sortby={{sortby}}&search={{search}}" class="btn btn-outline-dark">
                 Prev
             </a>
             {{/if}}
 
-            {{#if nextCursor }}
-            <a href="?cursor={{nextCursor}}&direction=next" class="btn btn-outline-dark">
+            {{#if nextPage }}
+            <a href="?page={{nextPage}}&sortby={{sortby}}&search={{search}}" class="btn btn-outline-dark">
                 Next
             </a>
-            {{/if}}
+            {{/if }}
         </div>
         <!-- End::Pagination -->
 
@@ -143,6 +174,21 @@
             toastElement.remove();
         });
     }
+
+
+    //Sort by selected
+    const sortby = '{{ sortby }}';
+
+    function selectOption(value) {
+        let select = document.getElementById('sortby');
+        for (let option of select.options) {
+            if (option.value === value) {
+                option.selected = true;
+                break;
+            }
+        }
+    }
+    selectOption(sortby);
 
 </script>
 

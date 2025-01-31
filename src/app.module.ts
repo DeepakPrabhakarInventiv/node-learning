@@ -9,6 +9,7 @@ import { CartModule } from './cart/cart.module';
 import { WishlistModule } from './wishlist/wishlist.module';
 import { OrderModule } from './order/order.module';
 import { RedisModule } from './redis/redis.module';
+import { UploadController } from './upload.controller';
 
 @Module({
   imports: [
@@ -21,7 +22,7 @@ import { RedisModule } from './redis/redis.module';
     OrderModule,
     RedisModule,
   ],
-  controllers: [AppController],
+  controllers: [AppController, UploadController],
 })
 export class AppModule {
   configure(consumer: MiddlewareConsumer) {

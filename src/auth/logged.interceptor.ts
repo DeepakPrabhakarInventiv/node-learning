@@ -9,6 +9,7 @@ import { JwtService } from '@nestjs/jwt';
 import { Request, Response } from 'express';
 import { CartService } from 'src/cart/cart.service';
 import { WishlistService } from 'src/wishlist/wishlist.service';
+import { UserService } from 'src/user/user.service';
 
 @Injectable()
 export class LoggedInterceptor implements NestInterceptor {
@@ -16,6 +17,7 @@ export class LoggedInterceptor implements NestInterceptor {
         private jwtService: JwtService,
         private cartService: CartService,
         private wishlistService: WishlistService,
+        private userService: UserService,
     ) { }
 
     async intercept(context: ExecutionContext, next: CallHandler): Promise<any> {
@@ -26,6 +28,7 @@ export class LoggedInterceptor implements NestInterceptor {
         let isLoggedIn = false;
         let cartCount = 0;
         let wishlistCount = 0;
+        let profileImg = '';
 
         if (authHeader && authHeader.startsWith('Bearer ')) {
             const token = authHeader.split(' ')[1]; // Extract token
@@ -50,6 +53,9 @@ export class LoggedInterceptor implements NestInterceptor {
                 //wishlist count
                 wishlistCount = await this.wishlistService.countWishlist(payload.id);
 
+                //profile img
+                profileImg = await this.userService.getProfileImg(payload.id);
+
             } catch (error) {
                 console.error('Invalid or expired token:', error.message);
             }
@@ -59,6 +65,7 @@ export class LoggedInterceptor implements NestInterceptor {
         response.locals.isLoggedIn = isLoggedIn;
         response.locals.cartCount = cartCount;
         response.locals.wishlistCount = wishlistCount;
+        response.locals.profileImg = profileImg;
 
 
         return next.handle(); // Proceed with the request handling

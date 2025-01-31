@@ -79,4 +79,9 @@ export class UserService {
     return this.userModel.findOne({ email: emailaddress }).exec();
   }
 
+  async getProfileImg(id: string): Promise<any> {
+    const user = await this.userModel.findById(id).exec();
+    return user.profile_img;
+  }
+
 }

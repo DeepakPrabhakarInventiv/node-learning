@@ -1,9 +1,9 @@
-import { IsNumberString, IsOptional, IsString } from "class-validator";
+import { IsNumber, IsNumberString, IsOptional, IsString } from "class-validator";
 
 export class PaginationDto {
     @IsOptional()
     @IsString()
-    cursor?: string; // MongoDB ObjectId or unique field
+    page?: string; // MongoDB ObjectId or unique field
 
     @IsOptional()
     @IsNumberString()
@@ -11,6 +11,11 @@ export class PaginationDto {
 
     @IsOptional()
     @IsString()
-    direction?: string; // 'next' | 'prev' 
+    search?: string; // search
+
+    @IsOptional()
+    @IsString()
+    sortby?: string; // sortby
+
 
 }

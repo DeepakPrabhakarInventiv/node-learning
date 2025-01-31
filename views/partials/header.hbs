@@ -35,13 +35,15 @@
                             <li><a href="/products" class="nav-link px-2 link-body-emphasis">Products</a></li>
                         </ul>
 
-
                         {{/if}}
 
                         <div class="side-menu">
                             {{#if isLoggedIn}}
 
                             <div class="dropdown text-end d-flex align-items-center">
+
+                                <span class="mx-1">|</span>
+
                                 <a href="/cart" class="nav-link px-2 link-body-emphasis d-flex align-items-center">
                                     <i class="bi bi-bag me-1"></i>
                                     <span class="badge rounded-1 bg-success text-white">{{
@@ -60,8 +62,12 @@
 
                                 <a href="#" class="d-block link-body-emphasis text-decoration-none dropdown-toggle"
                                     data-bs-toggle="dropdown" aria-expanded="false">
+                                    {{#if profileImg }}
+                                    <img src="{{ profileImg }}" alt="mdo" width="32" height="32" class="rounded-circle">
+                                    {{else}}
                                     <img src="https://github.com/mdo.png" alt="mdo" width="32" height="32"
                                         class="rounded-circle">
+                                    {{/if}}
                                 </a>
                                 <ul class="dropdown-menu text-small" style="">
                                     <li><a href="/profile" class="dropdown-item" href="#">Profile</a></li>

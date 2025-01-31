@@ -66,8 +66,12 @@ export class AppController {
     return res.render('products', {
       title: 'Products',
       products: productsData.products,
-      nextCursor: productsData.nextCursor,
-      prevCursor: productsData.prevCursor
+      nextPage: productsData.nextPage,
+      prevPage: productsData.prevPage,
+      totalPages: productsData.totalPages,
+      currentPage: productsData.currentPage,
+      sortby: paginationDto.sortby,
+      search: paginationDto.search
     });
   }
 

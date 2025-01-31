@@ -23,6 +23,10 @@ export class User {
 
     @Prop({ default: 'subscriber' })
     role: string;
+
+    @Prop()
+    profile_img: string;
+
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

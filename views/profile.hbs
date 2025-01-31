@@ -1,5 +1,9 @@
 {{> header }}
 
+<script src="https://unpkg.com/dropzone@5/dist/min/dropzone.min.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/dropzone@5/dist/min/dropzone.min.css" type="text/css" />
+
+
 <div class="bg-white">
     <div class="container py-5">
 
@@ -7,8 +11,26 @@
             <div class="col-lg-8 col-md-12">
                 <div class="card">
                     <div class="card-header py-3">
-                        <h5 class="card-title">Profile</h5>
-                        <p class="m-0">Hey, {{ user.firstname }} {{ user.lastname }}</p>
+                        <div class="d-flex align-items-center">
+                            {{#if user.profile_img }}
+                            <img src="{{ user.profile_img }}" alt="mdo" width="100" height="100" class="rounded-circle">
+                            {{else}}
+                            <img src="https://github.com/mdo.png" alt="mdo" width="100" height="100"
+                                class="rounded-circle">
+                            {{/if}}
+                            <div class="profile-name ms-3">
+                                <h5 class="card-title mb-0">Profile</h5>
+                                <p class="m-0">
+                                    <span>Hey, {{ user.firstname }} {{ user.lastname }}</span>
+                                </p>
+                            </div>
+
+                        </div>
+
+                    </div>
+                    <div class="card-body">
+                        <h5 class="card-title mt-3 mb-3">Profile Picture</h5>
+                        <form action="/upload" class="dropzone" id="profile-dropzone"></form>
                     </div>
                     <div class="card-body">
                         <form method="POST" id="formProfileUpdate">
@@ -23,6 +45,7 @@
                                     <input type="test" class="form-control" id="lastName" value="{{ user.lastname }}"
                                         required />
                                 </div>
+
                             </div>
 
                             <div class=" row">
@@ -42,11 +65,16 @@
                                 </div>
                             </div> --}}
 
+                            <input type="hidden" id="profile_img" name="profile_img" value="{{ user.profile_img }}" />
                             <button type="submit" class="btn btn-primary py-2 px-5 me-auto">Update Profile</button>
 
                             <div id="message"></div>
                         </form>
+
+
+
                     </div>
+
                 </div>
             </div>
         </div>
@@ -63,6 +91,7 @@
         const formData = {
             firstname: document.getElementById('firstName').value,
             lastname: document.getElementById('lastName').value,
+            profile_img: document.getElementById('profile_img').value,
         };
 
         /*const password = document.getElementById('password').value;
@@ -93,6 +122,32 @@
         return `<div class="alert alert-success mt-3">${msg}</div>`;
     }
 
+</script>
+<script>
+    Dropzone.options.profileDropzone = { // camelized version of the `id`
+        paramName: "file", // The name that will be used to transfer the file
+        maxFilesize: 1, // MB
+        uploadMultiple: false,
+        acceptedFiles: "image/*", // Allow only images
+        addRemoveLinks: true, // Show remove button
+        dictDefaultMessage: "Drag & drop files here or click to upload",
+        init: function () {
+            this.on("success", function (file, response) {
+                if (response.success == true) {
+                    const filePath = response.file?.path;
+                    document.getElementById('profile_img').value = filePath;
+                }
+                else {
+                    alert(response.message);
+                    console.error("Upload error:", response);
+                }
+
+            });
+            this.on("error", function (file, errorMessage) {
+                console.error("Upload error:", errorMessage);
+            });
+        }
+    };
 </script>
 
 {{> footer }}
